@@ -16,7 +16,7 @@ import { Plus, X } from 'lucide-react';
  * for the main dashboard page.
  */
 const HomePageWrapper: React.FC = () => {
-  const navigate = useNavigate();
+ 
   const dispatch = useAppDispatch();
   const [isTransactionFormOpen, setIsTransactionFormOpen] = React.useState(false);
   const [isCategoryFormOpen, setIsCategoryFormOpen] = React.useState(false);

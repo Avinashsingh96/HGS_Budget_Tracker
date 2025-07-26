@@ -23,14 +23,14 @@ import { TransactionForm } from '@/components/organisms/TransactionForm';
 import CategoryForm from '@/components/organisms/CategoryForm';
 import { addTransaction, addCustomCategory } from '@/store/slices/budgetSlice';
 import { Category } from '@/types';
-import { 
-  Plus, 
+import {
+  Plus,
   BarChart3,
   Calendar,
   Settings,
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
   Target,
   ChevronRight,
   X
@@ -56,8 +56,8 @@ interface HomePageProps {
   onAddCategory?: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ 
-  isTransactionFormOpen = false, 
+const HomePage: React.FC<HomePageProps> = ({
+  isTransactionFormOpen = false,
   onCloseTransactionForm,
   onAddTransaction,
   onAddCategory
@@ -66,12 +66,12 @@ const HomePage: React.FC<HomePageProps> = ({
   const { transactions, categories } = useAppSelector(state => state.budget);
   const dispatch = useAppDispatch();
   const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
-  
+
   // Debug: Log category modal state changes
   useEffect(() => {
     console.log('🔄 isCategoryFormOpen state changed:', isCategoryFormOpen);
   }, [isCategoryFormOpen]);
-  
+
   // Use custom hook for financial calculations
   const {
     totalIncome,
@@ -92,13 +92,9 @@ const HomePage: React.FC<HomePageProps> = ({
   const handleViewAnalytics = () => navigate('/analytics');
   const handleManageCategories = () => navigate('/categories');
   const handleViewHistory = () => navigate('/transactions');
-  
-  // Category form handlers
-  const handleAddCategory = () => {
-    console.log('🔄 handleAddCategory called, setting isCategoryFormOpen to true');
-    setIsCategoryFormOpen(true);
-  };
-  
+
+
+
   const handleCategorySubmit = async (categoryData: Omit<Category, 'id'>) => {
     try {
       console.log('🔄 handleCategorySubmit called, submitting category:', categoryData);
@@ -129,49 +125,49 @@ const HomePage: React.FC<HomePageProps> = ({
       {/* Quick Actions Grid */}
       <div>
         <div className="flex items-center justify-between mb-4 lg:mb-6">
-        <div>
+          <div>
             <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">Quick Actions</h2>
             <p className="text-gray-600 text-sm lg:text-base xl:text-lg">Get started with these common tasks</p>
-        </div>
+          </div>
           <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700">
-          <Settings className="w-4 h-4 mr-2" />
+            <Settings className="w-4 h-4 mr-2" />
             Customize
-        </Button>
-      </div>
+          </Button>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        <QuickAction
-          icon={<Plus className="w-6 h-6" />}
-          title="Add Transaction"
+          <QuickAction
+            icon={<Plus className="w-6 h-6" />}
+            title="Add Transaction"
             description="Record new income or expense with detailed categorization"
-          onClick={handleAddTransaction}
-          variant="primary"
+            onClick={handleAddTransaction}
+            variant="primary"
             badge={transactions.length === 0 ? "New" : undefined}
             stats={`${transactions.length} total`}
-        />
-        <QuickAction
-          icon={<BarChart3 className="w-6 h-6" />}
-          title="View Analytics"
+          />
+          <QuickAction
+            icon={<BarChart3 className="w-6 h-6" />}
+            title="View Analytics"
             description="Explore detailed insights and spending patterns"
-          onClick={handleViewAnalytics}
+            onClick={handleViewAnalytics}
             variant="premium"
             stats="Advanced"
-        />
-        <QuickAction
-          icon={<Calendar className="w-6 h-6" />}
-          title="Transaction History"
+          />
+          <QuickAction
+            icon={<Calendar className="w-6 h-6" />}
+            title="Transaction History"
             description="Browse and manage all your financial records"
-          onClick={handleViewHistory}
+            onClick={handleViewHistory}
             variant="secondary"
             stats={`${transactions.length} items`}
-        />
-        <QuickAction
-          icon={<Settings className="w-6 h-6" />}
-          title="Manage Categories"
+          />
+          <QuickAction
+            icon={<Settings className="w-6 h-6" />}
+            title="Manage Categories"
             description="Organize your spending with custom categories"
-          onClick={handleManageCategories}
+            onClick={handleManageCategories}
             variant="success"
             stats={`${categories.length} categories`}
-        />
+          />
         </div>
       </div>
 
@@ -187,32 +183,32 @@ const HomePage: React.FC<HomePageProps> = ({
           </Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        <SummaryCard
-          title="Total Income"
-          amount={totalIncome}
-          trend="up"
-          trendValue={12.5}
-          icon={<TrendingUp className="w-5 h-5" />}
+          <SummaryCard
+            title="Total Income"
+            amount={totalIncome}
+            trend="up"
+            trendValue={12.5}
+            icon={<TrendingUp className="w-5 h-5" />}
             color="income"
             subtitle="This month"
             progress={totalIncome > 0 ? Math.min(100, (totalIncome / 10000) * 100) : 0}
-        />
-        <SummaryCard
-          title="Total Expenses"
-          amount={totalExpenses}
-          trend="down"
-          trendValue={8.2}
-          icon={<TrendingDown className="w-5 h-5" />}
+          />
+          <SummaryCard
+            title="Total Expenses"
+            amount={totalExpenses}
+            trend="down"
+            trendValue={8.2}
+            icon={<TrendingDown className="w-5 h-5" />}
             color="expense"
             subtitle="This month"
             progress={totalIncome > 0 ? Math.min(100, (totalExpenses / totalIncome) * 100) : 0}
-        />
-        <SummaryCard
-          title="Net Savings"
-          amount={netSavings}
-          trend={netSavings >= 0 ? "up" : "down"}
-          trendValue={netSavings >= 0 ? 15.3 : -5.2}
-          icon={<DollarSign className="w-5 h-5" />}
+          />
+          <SummaryCard
+            title="Net Savings"
+            amount={netSavings}
+            trend={netSavings >= 0 ? "up" : "down"}
+            trendValue={netSavings >= 0 ? 15.3 : -5.2}
+            icon={<DollarSign className="w-5 h-5" />}
             color={netSavings >= 0 ? "savings" : "expense"}
             subtitle="This month"
             progress={netSavings >= 0 ? Math.min(100, (netSavings / Math.max(totalIncome, 1)) * 100) : 0}
@@ -269,7 +265,7 @@ const HomePage: React.FC<HomePageProps> = ({
           <FinancialInsightsCard
             insights={insights}
             onAddTransaction={handleAddTransaction}
-                  />
+          />
         </div>
       </div>
 

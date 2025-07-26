@@ -38,7 +38,7 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({
   onCloseEditModal,
   editingTransaction,
   onUpdateTransaction,
-  onAddCategory
+
 }) => {
   const dispatch = useAppDispatch();
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
