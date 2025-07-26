@@ -12,6 +12,7 @@ interface CategoryFormProps {
   onCancel: () => void;
   isEditing?: boolean;
   isSubmitting?: boolean;
+  hideHeader?: boolean;
 }
 
 const defaultIcons = {
@@ -29,7 +30,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   onSubmit,
   onCancel,
   isEditing = false,
-  isSubmitting = false
+  isSubmitting = false,
+  hideHeader = false
 }) => {
   const [formData, setFormData] = useState({
     name: category?.name || '',
@@ -61,16 +63,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
   return (
     <Card className="w-full max-w-md mx-auto bg-white shadow-2xl border-0 rounded-xl overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
-        <CardTitle className="flex items-center justify-between text-white">
-          <span className="text-xl font-bold">
-            {isEditing ? '✏️ Edit Category' : '➕ Add New Category'}
-          </span>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20 rounded-full">
-            <X className="h-5 w-5" />
-          </Button>
-        </CardTitle>
-      </CardHeader>
+      {!hideHeader && (
+        <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
+          <CardTitle className="flex items-center justify-between text-white">
+            <span className="text-xl font-bold">
+              {isEditing ? '✏️ Edit Category' : '➕ Add New Category'}
+            </span>
+            <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20 rounded-full">
+              <X className="h-5 w-5" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+      )}
       
       <CardContent className="p-6 bg-white">
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -102,7 +106,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-green-300 focus:border-green-500 rounded-lg">
                 <SelectValue placeholder="Select category type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[70]">
                 <SelectItem value="income">💰 Income</SelectItem>
                 <SelectItem value="expense">💸 Expense</SelectItem>
               </SelectContent>
@@ -128,7 +132,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                   <span className="font-medium">Select Icon</span>
                 </Button>
                 {showIconSelector && (
-                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-10">
+                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-[70]">
                     <div className="grid grid-cols-5 gap-2">
                       {(formData.type === 'income' ? defaultIcons.income : defaultIcons.expense).map((icon) => (
                         <button
@@ -167,7 +171,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                   <span className="font-medium">Select Color</span>
                 </Button>
                 {showColorPicker && (
-                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-10">
+                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-[70]">
                     <div className="grid grid-cols-6 gap-2">
                       {defaultColors.map((color) => (
                         <button

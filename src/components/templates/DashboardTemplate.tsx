@@ -5,7 +5,7 @@ import { TransactionForm } from '@/components/organisms/TransactionForm';
 import SummaryCard from '@/components/molecules/SummaryCard';
 import TransactionItem from '@/components/molecules/TransactionItem';
 import { Transaction, Category, BudgetSummary } from '@/types';
-import { Plus, TrendingUp, TrendingDown, DollarSign, History, Settings, BarChart3, HelpCircle, Keyboard } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, DollarSign, History, Settings, BarChart3, HelpCircle, Keyboard, Pencil, X } from 'lucide-react';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface DashboardTemplateProps {
@@ -178,15 +178,35 @@ export const DashboardTemplate: React.FC<DashboardTemplateProps> = ({
 
         {/* Transaction Form Modal */}
         {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-2xl max-h-[98vh] overflow-y-auto">
-              <TransactionForm
-                categories={categories}
-                onSubmit={handleFormSubmit}
-                onCancel={handleFormCancel}
-                transaction={editingTransaction || undefined}
-                isEditing={!!editingTransaction}
-              />
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+              {/* Sticky Header */}
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+                <span className="text-xl font-bold text-blue-700 flex items-center">
+                  <span className="mr-2">
+                    {editingTransaction ? (
+                      <Pencil className="h-6 w-6 text-blue-700" />
+                    ) : (
+                      <Plus className="h-6 w-6 text-blue-700" />
+                    )}
+                  </span>
+                  {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleFormCancel} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <TransactionForm
+                  categories={categories}
+                  onSubmit={handleFormSubmit}
+                  onCancel={handleFormCancel}
+                  transaction={editingTransaction || undefined}
+                  isEditing={!!editingTransaction}
+                  hideHeader={true}
+                />
+              </div>
             </div>
           </div>
         )}

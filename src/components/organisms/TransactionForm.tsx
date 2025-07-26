@@ -12,6 +12,8 @@ interface TransactionFormProps {
   onCancel: () => void;
   transaction?: Transaction;
   isEditing?: boolean;
+  hideHeader?: boolean;
+  onAddCategory?: () => void;
 }
 
 const defaultIcons = {
@@ -24,7 +26,9 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   onSubmit,
   onCancel,
   transaction,
-  isEditing = false
+  isEditing = false,
+  hideHeader = false,
+  onAddCategory
 }) => {
   const [formData, setFormData] = useState({
     type: transaction?.type || 'expense',
@@ -65,16 +69,18 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
 
   return (
     <Card className="w-full max-w-2xl mx-auto bg-white shadow-2xl border-0 rounded-xl overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
-        <CardTitle className="flex items-center justify-between text-white">
-          <span className="text-2xl font-bold">
-            {isEditing ? '✏️ Edit Transaction' : '➕ Add New Transaction'}
-          </span>
-          <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20 rounded-full">
-            <X className="h-6 w-6" />
-          </Button>
-        </CardTitle>
-      </CardHeader>
+      {!hideHeader && (
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
+          <CardTitle className="flex items-center justify-between text-white">
+            <span className="text-2xl font-bold">
+              {isEditing ? '✏️ Edit Transaction' : '➕ Add New Transaction'}
+            </span>
+            <Button variant="ghost" size="sm" onClick={onCancel} className="text-white hover:bg-white/20 rounded-full">
+              <X className="h-6 w-6" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+      )}
       <CardContent className="p-8 bg-white">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* First Row - Type and Icon */}
@@ -90,7 +96,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                 <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 rounded-lg">
                   <SelectValue placeholder="Select transaction type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[70]">
                   <SelectItem value="income">💰 Income</SelectItem>
                   <SelectItem value="expense">💸 Expense</SelectItem>
                 </SelectContent>
@@ -110,7 +116,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                   <span className="font-medium">Select Icon</span>
                 </Button>
                 {showIconSelector && (
-                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-10">
+                  <div className="absolute top-full left-0 right-0 mt-1 p-4 bg-white border-2 border-gray-200 rounded-lg shadow-xl z-[70]">
                     <div className="grid grid-cols-6 gap-3">
                       {(formData.type === 'income' ? defaultIcons.income : defaultIcons.expense).map((icon) => (
                         <button
@@ -144,12 +150,12 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      // This will be handled by the parent component
-                      onCancel();
+                      console.log('🔄 Add Category button clicked in TransactionForm');
+                      onAddCategory?.();
                     }}
                     className="text-blue-600 border-blue-300 hover:bg-blue-50"
                   >
-                    Go to Category Management
+                    Add Category
                   </Button>
                 </div>
               ) : (
@@ -160,7 +166,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                 <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 rounded-lg">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[70]">
                   {filteredCategories.length > 0 ? (
                     filteredCategories.map((category) => (
                       <SelectItem key={category.id} value={category.name || `category-${category.id}`} className="py-3">

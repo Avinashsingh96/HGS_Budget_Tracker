@@ -4,11 +4,12 @@ import TransactionSearch from '@/components/organisms/TransactionSearch';
 import TransactionExport from '@/components/organisms/TransactionExport';
 import TransactionItem from '@/components/molecules/TransactionItem';
 import { TransactionForm } from '@/components/organisms/TransactionForm';
+import CategoryForm from '@/components/organisms/CategoryForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Download, FileText } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Plus, X, Pencil } from 'lucide-react';
 import { useAppDispatch } from '@/store/hooks';
-import { addTransaction } from '@/store/slices/budgetSlice';
+import { addTransaction, addCustomCategory } from '@/store/slices/budgetSlice';
 
 interface TransactionHistoryPageProps {
   transactions: Transaction[];
@@ -22,6 +23,7 @@ interface TransactionHistoryPageProps {
   onCloseEditModal?: () => void;
   editingTransaction?: Transaction | null;
   onUpdateTransaction?: (updatedTransaction: Omit<Transaction, 'id'>) => void;
+  onAddCategory?: () => void;
 }
 
 const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({
@@ -35,11 +37,18 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({
   isEditModalOpen = false,
   onCloseEditModal,
   editingTransaction,
-  onUpdateTransaction
+  onUpdateTransaction,
+  onAddCategory
 }) => {
   const dispatch = useAppDispatch();
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(transactions);
   const [showExport, setShowExport] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+
+  // Debug: Log category modal state changes
+  React.useEffect(() => {
+    console.log('🔄 TransactionHistoryPage isCategoryFormOpen state changed:', isCategoryFormOpen);
+  }, [isCategoryFormOpen]);
 
   const handleEdit = (transaction: Transaction) => {
     onEditTransaction(transaction);
@@ -49,6 +58,29 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({
     if (window.confirm('Are you sure you want to delete this transaction?')) {
       onDeleteTransaction(id);
     }
+  };
+
+  // Category form handlers
+  const handleAddCategory = () => {
+    console.log('🔄 TransactionHistoryPage handleAddCategory called, setting isCategoryFormOpen to true');
+    setIsCategoryFormOpen(true);
+  };
+  
+  const handleCategorySubmit = async (categoryData: Omit<Category, 'id'>) => {
+    try {
+      console.log('🔄 TransactionHistoryPage handleCategorySubmit called, submitting category:', categoryData);
+      await dispatch(addCustomCategory(categoryData)).unwrap();
+      console.log('🔄 Category submitted successfully, closing modal');
+      setIsCategoryFormOpen(false);
+    } catch (error) {
+      console.error('Error adding category:', error);
+      alert('Failed to add category. Please try again.');
+    }
+  };
+
+  const handleCategoryCancel = () => {
+    console.log('🔄 TransactionHistoryPage handleCategoryCancel called, closing modal');
+    setIsCategoryFormOpen(false);
   };
 
   // Calculate summary for filtered transactions
@@ -237,33 +269,96 @@ const TransactionHistoryPage: React.FC<TransactionHistoryPageProps> = ({
 
         {/* Transaction Form Modal */}
         {isTransactionFormOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl">
-              <TransactionForm
-                categories={categories}
-                onSubmit={(newTransaction) => {
-                  dispatch(addTransaction(newTransaction));
-                  onCloseTransactionForm?.();
-                }}
-                onCancel={() => onCloseTransactionForm?.()}
-              />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+              {/* Sticky Header */}
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+                <span className="text-xl font-bold text-blue-700 flex items-center">
+                  <span className="mr-2">
+                    <Plus className="h-6 w-6 text-blue-700" />
+                  </span>
+                  Add New Transaction
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => onCloseTransactionForm?.()} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <TransactionForm
+                  categories={categories}
+                  onSubmit={(newTransaction) => {
+                    dispatch(addTransaction(newTransaction));
+                    onCloseTransactionForm?.();
+                  }}
+                  onCancel={() => onCloseTransactionForm?.()}
+                  hideHeader={true}
+                  onAddCategory={handleAddCategory}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* Edit Transaction Modal */}
         {isEditModalOpen && editingTransaction && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl">
-              <TransactionForm
-                categories={categories}
-                transaction={editingTransaction}
-                onSubmit={(updatedTransaction) => {
-                  onUpdateTransaction?.(updatedTransaction);
-                }}
-                onCancel={() => onCloseEditModal?.()}
-                isEditing={true}
-              />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+              {/* Sticky Header */}
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+                <span className="text-xl font-bold text-blue-700 flex items-center">
+                  <span className="mr-2">
+                    <Pencil className="h-6 w-6 text-blue-700" />
+                  </span>
+                  Edit Transaction
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => onCloseEditModal?.()} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <TransactionForm
+                  categories={categories}
+                  transaction={editingTransaction}
+                  onSubmit={(updatedTransaction) => {
+                    onUpdateTransaction?.(updatedTransaction);
+                  }}
+                  onCancel={() => onCloseEditModal?.()}
+                  isEditing={true}
+                  hideHeader={true}
+                  onAddCategory={handleAddCategory}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Category Form Modal */}
+        {isCategoryFormOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4" onClick={handleCategoryCancel}>
+            <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+              {/* Sticky Header */}
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+                <span className="text-xl font-bold text-green-700 flex items-center">
+                  <span className="mr-2">
+                    <Plus className="h-6 w-6 text-green-700" />
+                  </span>
+                  Add New Category
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleCategoryCancel} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <CategoryForm
+                  key={`category-form-${isCategoryFormOpen}`}
+                  onSubmit={handleCategorySubmit}
+                  onCancel={handleCategoryCancel}
+                  hideHeader={true}
+                />
+              </div>
             </div>
           </div>
         )}

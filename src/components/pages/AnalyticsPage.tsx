@@ -2,7 +2,7 @@ import React from 'react';
 import AnalyticsDashboard from '@/components/organisms/AnalyticsDashboard';
 import { TransactionForm } from '@/components/organisms/TransactionForm';
 import { Transaction, Category } from '@/types';
-import { ArrowLeft, BarChart3, TrendingUp, DollarSign, TrendingDown } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, DollarSign, TrendingDown, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppDispatch } from '@/store/hooks';
@@ -15,6 +15,7 @@ interface AnalyticsPageProps {
   onBack: () => void;
   isTransactionFormOpen?: boolean;
   onCloseTransactionForm?: () => void;
+  onAddCategory?: () => void;
 }
 
 const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
@@ -22,7 +23,8 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
   categories,
   onBack,
   isTransactionFormOpen = false,
-  onCloseTransactionForm
+  onCloseTransactionForm,
+  onAddCategory
 }) => {
   const dispatch = useAppDispatch();
 
@@ -163,16 +165,33 @@ const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
 
         {/* Transaction Form Modal */}
         {isTransactionFormOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl">
-              <TransactionForm
-                categories={categories}
-                onSubmit={(newTransaction) => {
-                  dispatch(addTransaction(newTransaction));
-                  onCloseTransactionForm?.();
-                }}
-                onCancel={() => onCloseTransactionForm?.()}
-              />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+            <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+              {/* Sticky Header */}
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+                <span className="text-xl font-bold text-blue-700 flex items-center">
+                  <span className="mr-2">
+                    <Plus className="h-6 w-6 text-blue-700" />
+                  </span>
+                  Add New Transaction
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => onCloseTransactionForm?.()} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <TransactionForm
+                  categories={categories}
+                  onSubmit={(newTransaction) => {
+                    dispatch(addTransaction(newTransaction));
+                    onCloseTransactionForm?.();
+                  }}
+                  onCancel={() => onCloseTransactionForm?.()}
+                  onAddCategory={onAddCategory}
+                  hideHeader={true}
+                />
+              </div>
             </div>
           </div>
         )}

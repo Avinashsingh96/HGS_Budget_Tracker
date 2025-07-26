@@ -15,12 +15,14 @@
  * - Quick action buttons for common tasks
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import { TransactionForm } from '@/components/organisms/TransactionForm';
-import { addTransaction } from '@/store/slices/budgetSlice';
+import CategoryForm from '@/components/organisms/CategoryForm';
+import { addTransaction, addCustomCategory } from '@/store/slices/budgetSlice';
+import { Category } from '@/types';
 import { 
   Plus, 
   BarChart3,
@@ -30,7 +32,8 @@ import {
   TrendingDown, 
   DollarSign, 
   Target,
-  ChevronRight
+  ChevronRight,
+  X
 } from 'lucide-react';
 
 import SummaryCard from '@/components/molecules/SummaryCard';
@@ -49,15 +52,25 @@ import { useFinancialMetrics } from '@/hooks/useFinancialMetrics';
 interface HomePageProps {
   isTransactionFormOpen?: boolean;
   onCloseTransactionForm?: () => void;
+  onAddTransaction?: () => void;
+  onAddCategory?: () => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ 
   isTransactionFormOpen = false, 
-  onCloseTransactionForm 
+  onCloseTransactionForm,
+  onAddTransaction,
+  onAddCategory
 }) => {
   const navigate = useNavigate();
   const { transactions, categories } = useAppSelector(state => state.budget);
   const dispatch = useAppDispatch();
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+  
+  // Debug: Log category modal state changes
+  useEffect(() => {
+    console.log('🔄 isCategoryFormOpen state changed:', isCategoryFormOpen);
+  }, [isCategoryFormOpen]);
   
   // Use custom hook for financial calculations
   const {
@@ -73,11 +86,35 @@ const HomePage: React.FC<HomePageProps> = ({
 
   // Navigation handlers
   const handleAddTransaction = () => {
-    // This will be handled by the parent component
+    console.log('🔄 handleAddTransaction called from QuickAction');
+    onAddTransaction?.();
   };
   const handleViewAnalytics = () => navigate('/analytics');
   const handleManageCategories = () => navigate('/categories');
   const handleViewHistory = () => navigate('/transactions');
+  
+  // Category form handlers
+  const handleAddCategory = () => {
+    console.log('🔄 handleAddCategory called, setting isCategoryFormOpen to true');
+    setIsCategoryFormOpen(true);
+  };
+  
+  const handleCategorySubmit = async (categoryData: Omit<Category, 'id'>) => {
+    try {
+      console.log('🔄 handleCategorySubmit called, submitting category:', categoryData);
+      await dispatch(addCustomCategory(categoryData)).unwrap();
+      console.log('🔄 Category submitted successfully, closing modal');
+      setIsCategoryFormOpen(false);
+    } catch (error) {
+      console.error('Error adding category:', error);
+      alert('Failed to add category. Please try again.');
+    }
+  };
+
+  const handleCategoryCancel = () => {
+    console.log('🔄 handleCategoryCancel called, closing modal');
+    setIsCategoryFormOpen(false);
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 lg:space-y-8">
@@ -238,16 +275,62 @@ const HomePage: React.FC<HomePageProps> = ({
 
       {/* Transaction Form Modal */}
       {isTransactionFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-2xl">
-            <TransactionForm
-              categories={categories}
-              onSubmit={(newTransaction) => {
-                dispatch(addTransaction(newTransaction));
-                onCloseTransactionForm?.();
-              }}
-              onCancel={() => onCloseTransactionForm?.()}
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
+          <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Sticky Header */}
+            <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+              <span className="text-xl font-bold text-blue-700 flex items-center">
+                <span className="mr-2">
+                  <Plus className="h-6 w-6 text-blue-700" />
+                </span>
+                Add New Transaction
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => onCloseTransactionForm?.()} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <TransactionForm
+                categories={categories}
+                onSubmit={(newTransaction) => {
+                  dispatch(addTransaction(newTransaction));
+                  onCloseTransactionForm?.();
+                }}
+                onCancel={() => onCloseTransactionForm?.()}
+                hideHeader={true}
+                onAddCategory={onAddCategory}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Form Modal */}
+      {isCategoryFormOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4" onClick={handleCategoryCancel}>
+          <div className="w-full max-w-md bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            {/* Sticky Header */}
+            <div className="flex items-center justify-between p-4 border-b flex-shrink-0 sticky top-0 bg-white z-10">
+              <span className="text-xl font-bold text-green-700 flex items-center">
+                <span className="mr-2">
+                  <Plus className="h-6 w-6 text-green-700" />
+                </span>
+                Add New Category
+              </span>
+              <Button variant="ghost" size="sm" onClick={handleCategoryCancel} className="text-gray-700 hover:bg-gray-100 rounded-full">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <CategoryForm
+                key={`category-form-${isCategoryFormOpen}`}
+                onSubmit={handleCategorySubmit}
+                onCancel={handleCategoryCancel}
+                hideHeader={true}
+              />
+            </div>
           </div>
         </div>
       )}
