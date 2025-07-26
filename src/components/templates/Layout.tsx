@@ -73,14 +73,14 @@ const Layout: React.FC<LayoutProps> = ({ children, onAddTransaction, onAddCatego
         />
       )}
 
-      {/* Sidebar */}
+      {/* Fixed Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:flex-shrink-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
             <h1 className="text-xl font-bold text-gray-900">HGS Budget</h1>
             <Button
               variant="ghost"
@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onAddTransaction, onAddCatego
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
@@ -115,16 +115,16 @@ const Layout: React.FC<LayoutProps> = ({ children, onAddTransaction, onAddCatego
           </nav>
 
           {/* Quick Actions */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t flex-shrink-0">
             {/* Add Transaction button removed from here */}
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <div className="bg-white shadow-sm border-b px-4 py-3 flex items-center justify-between">
+      {/* Main content area */}
+      <div className="lg:ml-64 flex-1 flex flex-col min-w-0">
+        {/* Fixed Top bar */}
+        <div className="fixed top-0 right-0 left-0 lg:left-64 z-40 bg-white shadow-sm border-b px-4 py-3 flex items-center justify-between">
           {/* Left side - Mobile menu button and app title */}
           <div className="flex items-center space-x-4">
             <Button
@@ -160,8 +160,8 @@ const Layout: React.FC<LayoutProps> = ({ children, onAddTransaction, onAddCatego
           </div>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 pt-4 lg:pt-6 pb-6 lg:pb-8">
+        {/* Page content with top padding for fixed header */}
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 pt-16 pb-6 lg:pb-8 overflow-y-auto">
           {children}
         </main>
       </div>
