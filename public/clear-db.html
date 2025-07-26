@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Database - Budget Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        .button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+        .button:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+        }
+        .button.success {
+            background: #2ed573;
+        }
+        .button.success:hover {
+            background: #26d0ce;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Database Reset Utility</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This will permanently delete all your budget data including transactions, categories, settings, and user preferences. This action cannot be undone.
+        </div>
+
+        <button class="button" onclick="clearDatabase()">
+            🗑️ Clear All Data & Reset Database
+        </button>
+
+        <button class="button success" onclick="goToApp()">
+            🏠 Go to Budget Tracker App
+        </button>
+
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <script>
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.style.background = isError ? 'rgba(255, 71, 87, 0.2)' : 'rgba(46, 213, 115, 0.2)';
+            status.style.border = isError ? '1px solid #ff4757' : '1px solid #2ed573';
+            status.innerHTML = message;
+        }
+
+        function clearDatabase() {
+            if (!confirm('Are you sure you want to delete ALL data? This action cannot be undone!')) {
+                return;
+            }
+
+            showStatus('🔄 Clearing database and all cached data...', false);
+
+            // Clear localStorage and sessionStorage
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('Local storage cleared');
+            } catch (e) {
+                console.log('Could not clear local storage:', e);
+            }
+
+            // Clear caches
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                    console.log('Caches cleared');
+                }).catch(e => {
+                    console.log('Could not clear caches:', e);
+                });
+            }
+
+            // Delete the database
+            const deleteRequest = indexedDB.deleteDatabase('BudgetTrackerDB');
+            
+            deleteRequest.onsuccess = function() {
+                showStatus('✅ All data cleared successfully! Redirecting to app...', false);
+                console.log('Database deleted successfully');
+                
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:5174';
+                }, 2000);
+            };
+            
+            deleteRequest.onerror = function() {
+                showStatus('❌ Failed to clear database. Please try again.', true);
+                console.error('Error deleting database:', deleteRequest.error);
+            };
+        }
+
+        function goToApp() {
+            window.location.href = 'http://localhost:5174';
+        }
+
+        // Check if database exists
+        function checkDatabase() {
+            const request = indexedDB.open('BudgetTrackerDB');
+            
+            request.onsuccess = function() {
+                const db = request.result;
+                const stores = Array.from(db.objectStoreNames);
+                showStatus(`📊 Database found with ${stores.length} stores: ${stores.join(', ')}`, false);
+                db.close();
+            };
+            
+            request.onerror = function() {
+                showStatus('❌ Database not found or inaccessible', true);
+            };
+        }
+
+        // Check database on page load
+        window.onload = checkDatabase;
+    </script>
+</body>
+</html> 
