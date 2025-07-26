@@ -6,7 +6,7 @@ import CategoryForm from '@/components/organisms/CategoryForm';
 import CategoryList from '@/components/organisms/CategoryList';
 import { TransactionForm } from '@/components/organisms/TransactionForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Category } from '@/types';
 
 interface CategoryManagementPageProps {

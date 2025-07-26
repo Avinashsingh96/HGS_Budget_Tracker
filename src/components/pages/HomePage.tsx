@@ -32,7 +32,7 @@ import {
   Target,
   ChevronRight
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
 import SummaryCard from '@/components/molecules/SummaryCard';
 import QuickAction from '@/components/molecules/QuickAction';
 import DashboardHeader from '@/components/organisms/DashboardHeader';

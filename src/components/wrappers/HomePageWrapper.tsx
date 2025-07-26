@@ -12,7 +12,6 @@ import HomePage from '@/components/pages/HomePage';
 const HomePageWrapper: React.FC = () => {
   const navigate = useNavigate();
   const [isTransactionFormOpen, setIsTransactionFormOpen] = React.useState(false);
-  const [isCategoryFormOpen, setIsCategoryFormOpen] = React.useState(false);
   
   const handleAddTransaction = () => {
     setIsTransactionFormOpen(true);
