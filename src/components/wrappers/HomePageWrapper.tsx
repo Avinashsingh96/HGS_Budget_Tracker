@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { useAppDispatch } from '@/store/hooks';
 import { addCustomCategory } from '@/store/slices/budgetSlice';
 import { Category } from '@/types';
