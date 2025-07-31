@@ -11,13 +11,15 @@ interface DashboardHeaderProps {
   totalExpenses: number;
   netSavings: number;
   transactionCount: number;
+  loginHandler?: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   totalIncome, 
   totalExpenses, 
   netSavings, 
-  transactionCount 
+  transactionCount,
+  loginHandler
 }) => {
   return (
     <div className={cn(
@@ -45,7 +47,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
             </Button>
             <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-              <User className="w-5 h-5" />
+              <User className="w-5 h-5" onClick={loginHandler}/>
             </Button>
           </div>
         </div>

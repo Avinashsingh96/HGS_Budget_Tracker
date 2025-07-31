@@ -20,7 +20,7 @@ const CategoryManagementPageWrapper: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isTransactionFormOpen, setIsTransactionFormOpen] = React.useState(false);
   const [isCategoryFormOpen, setIsCategoryFormOpen] = React.useState(false);
-  
+  const [isLoginFormOpen, setIsLoginFormOpen] = React.useState(false);
   const handleBack = () => navigate('/');
   
   const handleAddTransaction = () => {
